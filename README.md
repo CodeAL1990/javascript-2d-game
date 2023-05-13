@@ -52,4 +52,48 @@ Replace the 0s in drawImage with x and y will draw all frames of the sprite shee
 Passing in width and height into it will result in all frames being shrink the image to fit the width and height you designated (remember drawImage takes up to 9)
 To extract only 1 sprite from the image, you have to crop it out using all 9 arguments as the 4 parameters needed(sx, sy, sw, sh) can only be used when using all 9
 For starters, crop at position(sx, sy) 0, 0 (which is the top left corner of the image) until the width and height(sw, sh) to get the first sprite image
-//TBC
+You can use sx and sy to 'move' around in the sprite sheet (0 _ width and 0 _ height equals the first sprite in the first row and any number changes crops at the specified position in the sprite sheet)
+Add two properties in Player class called frameX and frameY, and set them to 0
+Replace the hardcoded numbers in sx and sy to the respective properties
+Now you are able to move through the sprite sheet by changing values in these properties
+Add another property called speed and set it to 0 for now
+Instead of incrementing x in update, increment it by speed
+Incrementing it by speed means at 0, the player will not move, negative player moves left and positive player moves right
+Now we can use the input behaviour we set in InputHandler to control player direction
+Pass input as argument in update to trigger this
+Also pass it in animate when you used update on player to reference it
+In Player class under update, we will be dealing with how each input key controls the horizontal(left right), and the vertical(up, down) movements
+Set a condition where if the keys array contains ArrowRight, speed is set to 5
+Now if you press the right arrow key, it should move to the right
+However, it does not matter if you hold the key, or pressed it for a millisecond, it will go right forever without stopping
+To fix it, add an else statement where speed is set back to 0
+Now whenever you let go of the right arrow key, the player stops
+If the above is working, add an else if statement for left arrow key but set the speed to a negative of the speed value you put in right arrow key (so the speed is consistent left and right)
+Now you can move the player left and right
+To make it so the player cannot move beyond the left canvas of the game, set a condition where if position x is less than 0, x is 0
+Set an else if condition where if x is more than gameWidth minus width, x is gameWidth minus width to prevent player moving beyond the right side of the canvas(gameWidth is the length of the game, width is the length of the player sprite)
+Separate the arrow key conditions with the horizontal and vertical movement conditions for better clarity
+Add a velocityY property and set it to 0
+Now, add an else if condition similar to the left right arrow keys for ArrowUp but decrement it by 30 instead
+Now, increment y by velocityY for vertical movement
+Pressing the up arrow key makes the player fly up and out of the canvas
+To mitigate this, we need an opposing variable(like gravity)
+Add a property called weight and set it to 0
+Since we need to check where the player is so we can determine when to apply gravity, you should create a new utility method just like draw and update inside Player class
+Create an onGround method and it will return true if statement is true and false if otherwise
+In this case, if y is more than or equal to gameHeight minus height(meaning if player is standing on the ground/x axis), it is true
+Add an if condition under vertical movement in update where when player is not onGround (!this.onGround), increment velocityY by the weight
+Give weight a value of 1 in property for now and you will see when your player jumps, it will eventually come down
+Increment velocityY to a smaller negative value for clarity(like -10 instead of -30)
+Now, add an else statement and set velocityY back to 0 for the if condition in vertical movement where you increment weight so player do not fall through the x-axis(ground) when it comes back down
+If player jumps too high, player will still fall partially through the ground because velocityY could not be resetted on time
+To prevent this, create a vertical boundary by adding a condition where if y is more than gameHeight - height(identical to onGround return statement), y is equal to gameHeight - height
+For now, player will jump(ArrowUp) higher and higher depending on how long you hold or continually press the key due to the increasing decremental value in your ArrowUp condition
+We should make sure player is standing on solid ground before it is allowed to jump
+Add an AND operator to ArrowUp condition with an additional onGround requirement so player can only jump when he or she is on the x axis
+Now you can jump without triggering it multiplie times as the key is pressed
+Set the decrement of velocityY back to 30 to strengthen your jump
+Currently, how the jump works is when you press it, velocityY will be at -30 keeps decreasing due to the increasing weight variable you put on it, stops at 0, and come down as velocityY becomes a positive number till it touches the ground where it will be set back to 0
+To give the player a jumping animation, set frameY to 1 when player is not on the ground, else set frameY to 0(add these in the vertical movement section)
+Now, head to Background class and pass gameWidth and gameHeight as arguments and turn them into class properties
+Add image property and link the image from html

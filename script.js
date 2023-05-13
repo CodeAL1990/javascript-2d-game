@@ -40,14 +40,19 @@ window.addEventListener("load", function () {
       this.x = 0;
       this.y = this.gameHeight - this.height;
       this.image = playerImage; //<--We learn that in subclassing video. You can use document.getElementById() if you want to
+      this.frameX = 0;
+      this.frameY = 0;
+      this.speed = 0;
+      this.velocityY = 0;
+      this.weight = 1;
     }
     draw(context) {
       context.fillStyle = "white";
       context.fillRect(this.x, this.y, this.width, this.height);
       context.drawImage(
         this.image,
-        0,
-        0,
+        this.frameX * this.width,
+        this.frameY * this.height,
         this.width,
         this.height,
         this.x,
@@ -56,12 +61,45 @@ window.addEventListener("load", function () {
         this.height
       );
     }
-    update() {
-      this.x++;
+    update(input) {
+      if (input.keys.indexOf("ArrowRight") > -1) {
+        this.speed = 5;
+      } else if (input.keys.indexOf("ArrowLeft") > -1) {
+        this.speed = -5;
+      } else if (input.keys.indexOf("ArrowUp") > -1 && this.onGround()) {
+        this.velocityY -= 30;
+      } else {
+        this.speed = 0;
+      }
+      //horizontal movement
+      this.x += this.speed;
+      if (this.x < 0) this.x = 0;
+      else if (this.x > this.gameWidth - this.width)
+        this.x = this.gameWidth - this.width;
+      //vertical movement
+      this.y += this.velocityY;
+      if (!this.onGround()) {
+        this.velocityY += this.weight;
+        this.frameY = 1;
+      } else {
+        this.velocityY = 0;
+        this.frameY = 0;
+      }
+      if (this.y > this.gameHeight - this.height)
+        this.y = this.gameHeight - this.height;
+    }
+    onGround() {
+      return this.y >= this.gameHeight - this.height;
     }
   }
 
-  class Background {}
+  class Background {
+    constructor(gameWidth, gameHeight) {
+      this.gameWidth = gameWidth;
+      this.gameHeight = gameHeight;
+      this.image = backgroundImage;
+    }
+  }
 
   class Enemy {}
 
@@ -75,7 +113,7 @@ window.addEventListener("load", function () {
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     player.draw(ctx);
-    player.update();
+    player.update(input);
     requestAnimationFrame(animate);
   }
   animate();
