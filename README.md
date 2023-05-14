@@ -97,3 +97,38 @@ Currently, how the jump works is when you press it, velocityY will be at -30 kee
 To give the player a jumping animation, set frameY to 1 when player is not on the ground, else set frameY to 0(add these in the vertical movement section)
 Now, head to Background class and pass gameWidth and gameHeight as arguments and turn them into class properties
 Add image property and link the image from html
+Add xy properties with value 0
+Add width and height (inspect the background image)
+Create a draw method and pass context as argument
+Now, use drawImage method on context and pass image and xy on it
+Just like input and player variables, create a new global variable background with an instance of the Background class using the new keyword, and pass the width and height of the canvas into it as arguments (because the background class expects it)
+Call the draw method on background in animate and pass ctx into it(Remember your draw method requires context as argument)
+Since we are drawing everything on a single canvas, draw the background first(place it in front of other methods in animate so sprites like player and enemy will be placed over the background)
+The width and height of the background is fixed so you can just pass it in the drawImage method as arguments (because background is not split like the sprites of player and enemy)
+Create an update method for background class and decrement x by speed -->Add a property speed and give it a value of 20<--
+Call the update method on background in animate
+Notice your background will just scroll to the left and it's gone
+To revert it back to the original state when it scrolls offscreen, set a condition in update for x where if it is less than 0 minus the width(meaning if background is completely offscreen), set x back to 0
+The background will now reset to 0 when scrolled offscreen but you will still see the empty space left behind by the background scrolling away first before it reverts back to its original state
+To fix this, create a second drawImage in draw method but add the width property to x coordinate so javascript will draw the background on the empty space the first drawImage method left behind, giving the one endlessly looping background
+The looping background will still have a very small gap due to the speed property so you will need to deduct the x coordinate in the second drawImage method by the speed as well to account for this
+Comment out update method for background in animate for now so the moving background does not distract you
+Now, fill your Enemy class using gameWidth and gameHeight as arguments(because Enemy class needs to know the boundaries of the game, just like Player class)
+Set those arguments as class properties
+Inspect your enemy image and set the width and height of a single sprite in properties
+Set image as a property and link the img tag to it (3 ways to this)
+Create xy properties and assign 0 to them
+Create draw method with context argument and use drawImage on this argument with image and xy properties passed into it for now
+Create an instance of Enemy class using new keyword with variable enemy1 and pass the width and height of the canvas in the instance
+Call draw in enemy1 inside animate
+Pass the width and height in Enemy's drawImage, squeezing the image into a container based on width and height property values
+Just like Player class, we will need to use all 9 parameters on drawImage to crop out the sprites of the enemy image
+Pass sx as 0 multiplied by the width to crop the first sprite of enemy image, keep sy as 0 as there is only 1 row of sprites, and pass the width and height to sw and sh
+Hardcoding values inside functions is not good because when you need to change the values you will need to get inside these functions and change them which may break other parts of the game that use its logic
+So, create frameX property and set it to 0, and replace the hardcoded 0 in sx to frameX property (sy can stay 0 because you know that you will never change it)
+Using Player class as reference, y property will be set to gameHeight minus height as enemy1(the worm) should only stay on the ground logically
+Set x property to gameWidth for Enemy class to hide it at the right side of canvas for now
+Create an update method for Enemy and decrement x to move Enemy to the left
+Call update of enemy1 inside animate
+For enemies, you want multiples of them unlike player
+Create global enemies variable and assign an empty array to it
