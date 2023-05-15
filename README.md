@@ -132,3 +132,50 @@ Create an update method for Enemy and decrement x to move Enemy to the left
 Call update of enemy1 inside animate
 For enemies, you want multiples of them unlike player
 Create global enemies variable and assign an empty array to it
+Delete the enemy1 variable and related lines of code as you will be draw and update from inside handleEnemies function(which you have pre-made as a template before)
+Call push on enemies array inside handleEnemies and pass new Enemy with canvas width and height in it as arguments(because again, the Enemy class expects gameWidth and gameHeight)
+Just like the deleted enemy1, you want to call on the draw and update method of Enemy class, this time inside handleEnemies
+Since we are using an array now, after pushing array items, you want to loop inside the array using a forEach method and for each enemy, call the draw with an argument(What does draw in Enemy expects?), and the update method
+We want to test if this works so move the push method inside handleEnemies outside temporarily to create only 1 enemy when called(placing it inside will loop it multiple times per second with no limit when called, which will brick the browser depending on your pc power)
+Now call handleEnemies inside animate
+Once the above works(enemy worm should be crawling to the left just like when you used enemy1 variable), we would like to add an enemy within a set time interval like 2 seconds
+To do that, like previous projects related to this, we want to use time stamps and delta time
+Create a global helper variable called lastTime and set it to 0
+Create a local variable called deltaTime inside animate and deduct timeStamp with lastTime
+This timeStamp variable is calculated internally from requestAnimationFrame(animate) where it will call animate over and over when passed into it and within this method it has 'timestamps' in milliseconds
+Pass the timeStamp variable into animate as an argument so it can track this internal timestamp to be used in the deltaTime calculations
+As usual, the first count is undefined because there is no timestamp when the the first requestAnimationFrame starts, so pass 0 into the call of animate to start from 0
+Now, set lastTime to timeStamp below deltaTime variable so the previous timestamps will be used in the loop for calculation
+You can console.log(deltaTime) below lastTime = timeStamp and inspect in console to check these timestamps at work(it will be 16 on average for the fast computers and might be higher for slower computers)
+Now we can access deltaTime to periodically create enemies
+Pass deltaTime into both the handleEnemies method in animate and its original function
+Comment the push method out, and we need two global helper variables to use deltaTime
+Create enemyTimer variable and set to 0 which we will use to count from 0 to a limit you set, and whenever it reaches the limit it will reset to 0
+Create enemyInterval and set it to 1000 which is the limit you are setting
+With the above variables added, set a condition in handleEnemies where if enemyTimer is more than enemyInterval, push new Enemy with the related arguments inside the enemies array(basically move that push method inside this condition)
+Reset enemyTimer back to 0 inside this condition
+Else, keep incrementing deltaTime to enemyTimer till it reaches the limit(1000 in this case) before it resets and add another new enemy
+In a game, the enemies will appear at a random interval
+Add a speed property to Enemy class and give it a number
+Instead of just decrementing x in update, decrement it by speed
+Enemies are now appearing at a constant interval which is predictable so we will now add a randomEnemyInterval global variable and randomise it between 500 to 1500
+In the condition in handleEnemies, instead of just when enemyTimer reaches enemyInterval, add randomEnemyInterval into the calculation as well(which will mean instead of just every second(1000 milliseconds), it will be every 1sec + 0.5 to 1.5sec)
+Also, set randomEnemyInterval to another random number between 500 to 1500 again in the condition so that the next push loop will be at a different interval
+Uncomment out background.update in animate to see your game in action! (kinda)
+Comment out the white rectangle in Player class under update(fillRect and fillStyle)
+Currently, we are displaying the first frame of the sprite sheet, so let's try and add the rest to animate movements for both Player and Enemy
+Comment out background.update again for now
+deltaTime will the THE variable to make sure the game runs at smoothly across machines, even at different fps
+Pass deltaTime into update in handleEnemies and in Enemy update
+Add maxFrame property and set it to 5(6 sprites, because it starts from 0)
+Add a helper property called fps and set it to 20. fps will only affect horizontal navigation animation within Enemy sprite sheet (the rest of the game such as Player and background is unaffected)
+Add two more helper properties called frameTimer, set it to 0, and frameInterval, set it to 1000 divided by fps
+For now, cycle between frames at full speed
+To do this, set a condition in Enemy update where if frameX is more than or equal to maxFrame, set frameX to 0
+Else, increment frameX
+You should now see the worm enemy animating but at very fast speeds
+To limit the speed to a certain interval, we will make use of the helper properties(frameTimer and frameInterval) we made
+Set a condition in Enemy update where if frameTimer is more than frameInterval, invoke the frameX condition you have written before(move it inside the new condition you have created)
+Set frameTimer back to 0 after the frameX condition has ran
+Else, increment frameTimer by deltaTime till it reaches the frameInterval threshold
+You should now see an animate worm enemy(if not check for undetected syntax or typing errors!)
