@@ -179,3 +179,55 @@ Set a condition in Enemy update where if frameTimer is more than frameInterval, 
 Set frameTimer back to 0 after the frameX condition has ran
 Else, increment frameTimer by deltaTime till it reaches the frameInterval threshold
 You should now see an animate worm enemy(if not check for undetected syntax or typing errors!)
+For Player class, add a maxFrame property, assigning the length of the sprite sheet horizontally
+In Player update, if frameX is more than or equal to maxFrame, set frameX back to 0, else, increment frameX till it reaches maxFrame limit
+Just like before in Enemy class, the animation goes very fast and we want to limit it using the three helper properties you used in Enemy, fps, frameTimer and frameInterval
+Copy those properties and paste them in Player properties
+Limit the animation speed by only invoking the frameX condition when frameTimer is more than frameInterval
+After invoking the frameX condition, reset frameTimer back to 0
+Else, if the frameX condition is not met, increment frameTimer by deltaTime
+Player update method do not have access to deltaTime variable in animate, so add deltaTime as an argument in player update in animate, and also the original Player update
+Now, player should be moving at a stable and coherent speed
+However, if player jumps you will see blinking due to missing frames because there are 9 sprites for the running animation but only 7 for the jumping animation
+Since jumping deals with vertical movement, go to vertical movement section and add maxFrame equals to 5(\*\*there is still a missing frame if you move horizontally and jump 4 times, the 4th jump will always miss a frame ) when not on ground, else maxFrame equals to 8 when on ground
+In handleEnemies, the push method is periodically adding Enemy class objects to the enemies array without removing it so the game will eventually bloat and cause memory leaks because your pc will eventually run out of memory for it
+We will need a way to remove the array items in enemies that have passed offscreen
+Add a markedForDeletion property in Enemy class and set it to false
+In Enemy update, set a condition where if enemy has moved pass the left side of the canvas completely(x is less than 0 minus width), markedForDeletion turns true
+Now, to make use of this markedForDeletion property, in handleEnemies, after the forEach method, filter enemies array and for each enemy, remove enemy array items that has markedForDeletion as false,
+Console.log enemies after the push method and you should see enemies being removed as they pass left of the canvas
+After the above is working, we shall now deal with score
+Set a global variable score and give it 0(const or let --> do you need the variable to be modified)
+We will now work on the displayStatusText blank function we created at the start of this project
+Pass the context as argument to it(because we want the score to show on the canvas)
+Use fillstyle on context applying black, use font on context with 40px Helvetica, use fillText with parameters text you want to show and the xy coordinates at the end (i.e fillText(text, x, y))
+Call displayStatusText and pass ctx to it
+Whenever enemy move pass the left of the canvas, increment score by 1 (place this after markedForDeletion turns true)
+We want to make the text on score nicer(using canvas shadow causes frame drops) so we will employ a trick instead
+Draw the same message twice (fillStyle and fillText twice) but replace black with white and change the coordinates of the second set slightly
+Now we shall work on the collision detection between Player and Enemy class
+We will use rectangles for hitboxes so use strokeRect and strokeStyle method in Enemy draw to visually display the hitbox around the Enemy class
+Do the same for Player draw
+Using rectangles for hitboxes will cause certain collision angles to look really awkward(both sprites not touching at all but it counts as collision)
+Try using circle instead using beginPath, arc and stroke methods
+The circle will appear at the top left edge and you will need to add the offset of x and y at their width and height divided by 2(or multiply my 0.5) to center them on the sprite(50% x 50% y position of the sprite dimensions)
+Draw the same circle for Enemy
+Now, to check for collision, you will need to check collision of player against all active enemies for each animation frame
+You can either do it in Enemy or Player but Player is preferred because there is only 1 player object but endless enemy objects
+So, add an enemies argument inside player update in animate and also the original Player update to reference it
+We will now work on collision detection inside Player update
+You will apply the forEach method on enemies array to account for all active enemies in the canvas
+For each enemy, you will need the center points of Player and Enemy circle hitboxes so add a variable called distanceX and assign the enemy's x position to it deducted by the player's x position to calculate the distance of X between them(Watch the video if you need to visually see what distance of X represents at 5:29:24)
+Do the same for coordinate y and name the variable distanceY
+We will now use pythagoras theorem for the distance between the 2 positions of Player and Enemy
+Since we now know the distance of X and Y(both are the sides of a right angled triangle), the longest side is the hypotenuse of these two distances
+Set the variable distance and assign it the square root of distanceX squared plus distanceY squared is equal to the hypotenuse according to the formula
+The hypotenuse the is the exact distance between the center point of the Player and Enemy
+After you have the distance, set a condition when distance is less than half the width of the enemy PLUS half the width of the player, gameOver is true
+Create a global gameOver variable and set it to false
+The game should pause or stop when gameOver is true so instead of just requestAnimationFrame(animate) constantly in animate, invoke it only when gameOver is false
+If the game stops when Player and Enemy collides, it is working
+Show a game over message by adding a condition in displayStatusText where if gameOver is true, showcase a game over text in the center of the canvas(using textAlign, fillStyle and fillText(text, x, y))
+Use canvas.width/2 for x to position it at the center of the canvas horizontally and y to whatever position you deem aesthetically pleasing
+To do the shadow trick just like the score text, copy and paste the fillStyle and fillText method, changing style to a different color and add some values to the coordinates
+\*There's a mistake in the way the collision works
