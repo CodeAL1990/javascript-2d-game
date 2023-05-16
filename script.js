@@ -77,7 +77,7 @@ window.addEventListener("load", function () {
         this.height
       );
     }
-    update(input, deltaTime, update) {
+    update(input, deltaTime, enemies) {
       //collision detection
       enemies.forEach((enemy) => {
         const distanceX = enemy.x - this.x;
