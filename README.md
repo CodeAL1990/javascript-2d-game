@@ -231,3 +231,91 @@ Show a game over message by adding a condition in displayStatusText where if gam
 Use canvas.width/2 for x to position it at the center of the canvas horizontally and y to whatever position you deem aesthetically pleasing
 To do the shadow trick just like the score text, copy and paste the fillStyle and fillText method, changing style to a different color and add some values to the coordinates
 \*There's a mistake in the way the collision works
+Copy and paste strokeStyle till stroke() in Enemy draw and change the color from white to blue, and remove the offset of of width height divided by 2(remove strokeRect from the duplicate)
+Do the same for Player draw
+You should see that the game stops when the blue circles collide, not the white circles which you want
+The blue circles represent what you are doing under collision detection while visually the white circles are what you want but they are not present in the collision detection logic
+As such, you will need to replicate this in the collision detection logic by tweaking distanceX and Y variables in the forEach method
+Add the offset of enemy width divided by 2 on enemy.x and the width of the player by 2 in player x(this.x)
+Do the same for distanceY and height
+Remember to put brackets on each offset (enemy.x + enemy.width/2), to calculate them first before deducting to get the distance accurately
+After the above is changed, you should see the white circles colliding and triggering game over instead of the blue ones
+Comment or delete these circles and rectangles hitboxes out after you are done
+We are now trying to make this game mobile friendly
+In CSS, give canvas1 a max-width and max-height of 100%
+Also give all element a value of 0 in margin and padding, and box sizing of border-box
+Increase the canvas width in js file until you can see the score text
+Currently, only refreshing restart the game
+Create a restartGame function
+Add a restart method in Player class and in it set x position back to the same position as in Player property and y to the same as its property as well
+Change x in Player property to 100, and do it for the restart method as well(aesthetic purposes?)
+You want player to start in running animation so 'import' maxFrame and frameY to restart
+In background class, add a restart method and set x to 0 to get visual feedback that the background also restarts to its starting point
+Call restart on player in the restartGame function, and do the same for background
+We want to reset score, enemies array, and remove the game over text, so set all of those to their original values in restartGame
+Now we want to assign a key to restart the game with
+In keydown event listener, add an else if condition where if enter is pressed AND gameOver is true, call restartGame
+Currently, pressing the enter key do not work as in animate, when gameOver is true, requestAnimationFrame will stop running
+Add the same animate call you did after animate in the restartGame function to call animate again after gameOver is swapped back to false
+When the game is restarted, score text gets clipped as it is using textAlign center in the gameOver condition in displayStatusText
+Add a textAlign for context before this gameOver condition and set it to left
+Now for the game over message you should tell the player to press enter to restart the game
+Now to support mobile, we will tamper with touch events
+Remove console.log(enemies)
+Add a touchstart event listener with all the other event listeners
+We will console.log something when the user touches the browser
+Add touchmove and touchend event listeners as well
+Console.log start, moving, end for the respective event listeners
+Once you touch the screen/browser, start console.logs, once you click and hold, moving console.logs. After you let go of the click, end console.logs
+If you console.log the event(or e) in touchstart, you can see a list of properties
+The one you are interested in is the coordinates which is stored in changedTouches property
+Click and you can see the pageX and pageY coordinates, indicating where the user is touching
+Console.log the event in touchmove will let you know where the user is swiping based on the start and end xy coordinates
+With this in mind, change the console.logs into the property changedTouches in the event at index 0 and property pageY
+Do it for all the touch events
+In the InputHandler constructor, add the property touchY and set it to an empty string
+Add touchThreshold property and set it to 30(start and end touch should be 30px apart)
+Now, instead of console.log the event properties, set touchY to the event property you are targetting(pageY in this case)
+Remove all console.logs from touch events
+Add swipeDistance variable in touchmove event listener and calculate in it e.changedTouches[0].pageY minus this.touchY
+Add a condition where if swipeDistance is less than negative touchThreshold(-30 representing upward movement) AND swipe up is not yet present in the keys array, push "swipe up" into keys
+Else, if swipeDistance is more than touchThreshold AND swipe down key is not in the keys array, push swipe up into keys(the opposite down movement is positive)
+In touchend event listener, console.log this.keys to confirm that there are no duplication of keys(if there is that means your conditions are not working, check for syntax, brackets and typos)
+Once the above is done, use splice method on keys array and remove swipe up and swipe down in the array once the touch 'ends'
+This way, only only swipe up or swipe down will be present in the array at any given time
+Remove the console.log in touchend once you have affirm the above is working
+We want the player to swipe down to trigger restart so add the condition in touchmove event listener after the swipe down condition, where if gameOver is true, call restartGame
+In the controls section in Player, for ArrowUp condition, add an OR operator after ArrowUp and insert an identical condition but for swipe up(remember brackets because AND operator is prioritized over OR)
+Now swiping up should make player jump
+Add swipe down text to the game over text to inform user
+Javascript fullscreen API allow us to show an element and all its descendants(in this case canvas and everything inside it) while hiding all other browser stuff like user interfact, sidebars etc
+Add a button and give it an id of fullScreenButton and the text Toggle FullScreen in html
+Style it in css(just refer to his dimensions i guess)
+Bring it to the js file using getElementById on variable fullScreenButton(assigning it using the Id directly in this case does not work as well as in properties because there is no reference yet)
+Create a toggleFullScreen function and console.log document.fullscreenElement
+document.fullscreenElement is a built in read only property on document object to check if full screen is activated or not
+Add a condition where if document.fullscreenElement is not present(not true), invoke requestFullscreen().then().catch() on canvas
+\*\*New js method i have not learned, asynchronous and Promise
+.requestFullscreen() method is asynchronous, returns a Promise
+Remove then() for now and in catch, if error(err) is caught, alert Error, can't enable full-screen mode: ${err.message} using template literals(back ticks)
+err.message is an auto generated error message from the browser
+Else, call document.exitFullscreen() to exit full screen(since the initial condition changes the game into full screen mode)
+If you call toggleFullScreen() to test the function, it will bring up an error because full screen can only be initiated by user gesture
+To fix this, create a click event listener for fullScreenButton and trigger it in the callback
+Once the above work, let's get back to collision detection because the current collision hitbox is simply unintuitive since if you uncomment the circle drawings on Player and Enemy, the circles are clearly bigger than the sprites which means alot of empty spaces are within the hitboxes as well
+Reducing the circle hitbox makes sense because when the sprites collide, the smaller circle means your sprites are actually 'touching' each other when colliding
+You can adjust the hitboxes in the draw method before applying it in the update method under collision detection because the latter is where the logic is executed while the former only showcases it visually and not functionally
+To reduce circle, you wannt to target the arc, and maybe instead of only dividing the radius (.arc(x,y,radius,start angle, end angle)) by 2, we can divide it by 3 to make it smaller
+Notice the circle is not exactly centered around the sprite, you can offset it in y by a positive number like 20(to move it down)
+Once you are visually satisfied with the hitboxes, update it in the collision detection section accordingly
+For the worm enemy, you want to adjust the hitbox to center around its head which is the majority of its body
+Make the changes visually in the Enemy draw just like in Player
+Divide the radius by 3 instead of 2 to make it smaller
+\*\*To see the circles properly you might want to move the circle drawings after drawImage to put them in front of the images for clearer visualization
+You want to move the circle horizontally to the left to match the head of the worm, so offset it by -20 for example
+Once you are satisfied with the hitbox location, we need to make the collision functional in the collision detection section in Player class update
+Since this only affects enemies, look for the variables and properties that affect enemies and update accordingly
+You changed x position of enemy so update that in distanceX for enemy
+You also changed division of width by 2 to 3 so update that too
+Once you are satisfied with the way the hitboxes collides, comment the circle drawings out again
+Done!
